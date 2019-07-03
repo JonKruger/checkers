@@ -5,12 +5,12 @@ from .board_initializer import BoardInitializer
 
 class Board:
 
-	def __init__(self):
+	def __init__(self, width=4, height=8, rows_per_user_with_pieces=3):
 		self.player_turn = 1
-		self.width = 4
-		self.height = 8
+		self.width = width
+		self.height = height
 		self.position_count = self.width * self.height
-		self.rows_per_user_with_pieces = 3
+		self.rows_per_user_with_pieces = rows_per_user_with_pieces
 		self.position_layout = {}
 		self.piece_requiring_further_capture_moves = None
 		self.previous_move_was_capture = False
@@ -19,6 +19,9 @@ class Board:
 
 	def count_movable_player_pieces(self, player_number = 1):
 		return reduce((lambda count, piece: count + (1 if piece.is_movable() else 0)), self.searcher.get_pieces_by_player(player_number), 0)
+
+	def get_player_pieces(self, player_number):
+		return self.searcher.get_pieces_by_player(player_number)
 
 	def get_possible_moves(self):
 		capture_moves = self.get_possible_capture_moves()

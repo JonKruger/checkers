@@ -42,6 +42,10 @@ class TestPossibleMoves(unittest.TestCase):
 		self.expect([[23, 32], [24, 31]]).move([23, 32])
 		self.expect([])
 
+	def test_possible_moves_different_board(self):
+		self.game = Game(width=5, height=6, rows_per_user_with_pieces=2)
+		self.expect([[6, 11], [7, 11], [7, 12], [8, 12], [8, 13], [9, 13], [9, 14], [10, 14], [10, 15]]).move([10, 14])
+
 	def move(self, move):
 		self.game.move(move)
 

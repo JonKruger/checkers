@@ -2,8 +2,8 @@ from .board import Board
 
 class Game:
 
-	def __init__(self):
-		self.board = Board()
+	def __init__(self, width=4, height=8, rows_per_user_with_pieces=3):
+		self.board = Board(width, height, rows_per_user_with_pieces)
 		self.moves = []
 		self.consecutive_noncapture_move_limit = 40
 		self.moves_since_last_capture = 0
