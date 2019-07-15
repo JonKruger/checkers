@@ -27,12 +27,3 @@ class TestGame(unittest.TestCase):
         self.assertListEqual(list(map(lambda p: p.position, player_1_pieces)), list(range(1,11)))
         self.assertListEqual(list(map(lambda p: p.position, player_2_pieces)), list(range(21,31)))
 
-'''
-        white_pieces = game.white().pieces()
-        for loc in range(21,33):
-            assert len(list(filter(lambda p: p.location() == loc, white_pieces))) == 1
-        
-        black_pieces = game.black().pieces()
-        for loc in range(1,13):
-            assert len(list(filter(lambda p: p.location() == loc, black_pieces))) == 1
-'''

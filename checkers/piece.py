@@ -109,3 +109,9 @@ class Piece:
 
 		if name == 'player':
 			self.other_player = 1 if value == 2 else 2
+
+	def __str__(self):
+		return ('B' if self.player == 1 else 'W') + ' ' + ('king ' if self.king == True else '') + str(self.position)
+
+	def __repr__(self):
+		return str(self)
