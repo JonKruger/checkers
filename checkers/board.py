@@ -20,6 +20,9 @@ class Board:
 	def count_movable_player_pieces(self, player_number = 1):
 		return reduce((lambda count, piece: count + (1 if piece.is_movable() else 0)), self.searcher.get_pieces_by_player(player_number), 0)
 
+	def get_uncaptured_pieces(self):
+		return filter(lambda piece: piece.captured == False, self.pieces)
+
 	def get_player_pieces(self, player_number):
 		return self.searcher.get_pieces_by_player(player_number)
 

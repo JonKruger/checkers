@@ -6,7 +6,10 @@ class BoardTestHelper(Board):
         Board.__init__(self, width, height, rows_per_user_with_pieces)
 
     def set_pieces(self, pieces):
-        pass
+        pieces = [BoardTestHelper.parse_piece_notation(p) for p in pieces]
+        for piece in pieces:
+            piece.board = self
+        self.pieces = pieces
 
     def parse_piece_notation(notation):
         values = notation.split() 

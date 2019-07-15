@@ -13,3 +13,11 @@ class TestBoardTestHelper(unittest.TestCase):
     def test_parse_piece_notation_king(self):
         piece = BoardTestHelper.parse_piece_notation('W king 11')
         assert str(piece) == 'W king 11'        
+
+    def test_setting_pieces(self):
+        board = BoardTestHelper()
+        board.set_pieces(['B 3','W 32','W king 11'])
+        assert [str(p) for p in board.pieces] == ['B 3','W 32','W king 11']
+        assert str(board.pieces[0]) == 'B 3'
+        assert str(board.pieces[1]) == 'W 32'
+        assert str(board.pieces[2]) == 'W king 11'

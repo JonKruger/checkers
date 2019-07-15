@@ -50,6 +50,8 @@ class TestPossibleMoves(unittest.TestCase):
 	def test_double_jump(self):
 		game = GameTestHelper()
 		game.board.set_pieces(['B 1','W 6','W 14'])
+		game.move([1, 10, 17])
+		assert [str(p) for p in game.board.get_uncaptured_pieces()] == ['B 17']
 
 	def move(self, move):
 		self.game.move(move)
