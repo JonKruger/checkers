@@ -47,11 +47,22 @@ class TestPossibleMoves(unittest.TestCase):
 		self.game = Game(width=5, height=6, rows_per_user_with_pieces=2)
 		self.expect([[6, 11], [7, 11], [7, 12], [8, 12], [8, 13], [9, 13], [9, 14], [10, 14], [10, 15]]).move([10, 14])
 
+	def test_jump_required(self):
+		game = GameTestHelper()
+		game.board.set_pieces(['B 1','W 6','B 4'])
+		self.assertEqual(game.get_possible_moves(), [[1, 10]])
+		self.assertRaises(ValueError, lambda: game.move([4, 8]))
+
 	def test_double_jump(self):
 		game = GameTestHelper()
-		game.board.set_pieces(['B 1','W 6','W 14'])
-		game.move([1, 10, 17])
-		assert [str(p) for p in game.board.get_uncaptured_pieces()] == ['B 17']
+		game.board.set_pieces(['B 1','W 6','W 14', 'W 16'])
+		self.assertEqual(game.whose_turn(), 1)
+		game.move([1, 10])
+		self.assertEqual(game.whose_turn(), 1)
+		self.assertEqual(game.get_possible_moves(), [[10, 17]])
+		game.move([10, 17])
+		self.assertEqual(game.whose_turn(), 2)
+		assert [str(p) for p in game.board.get_uncaptured_pieces()] == ['W 16', 'B 17']
 
 	def move(self, move):
 		self.game.move(move)

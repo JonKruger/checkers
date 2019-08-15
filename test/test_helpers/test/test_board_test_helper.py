@@ -18,6 +18,3 @@ class TestBoardTestHelper(unittest.TestCase):
         board = BoardTestHelper()
         board.set_pieces(['B 3','W 32','W king 11'])
         assert [str(p) for p in board.pieces] == ['B 3','W 32','W king 11']
-        assert str(board.pieces[0]) == 'B 3'
-        assert str(board.pieces[1]) == 'W 32'
-        assert str(board.pieces[2]) == 'W king 11'
