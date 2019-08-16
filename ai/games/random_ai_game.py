@@ -20,3 +20,4 @@ class RandomAIGame:
             self._game.move(move)
         print(f"Winner is {'Black' if self._game.get_winner() == 1 else 'White'}!")
         print(self._game.moves)
+        return self._game.moves, self._game.get_winner()
