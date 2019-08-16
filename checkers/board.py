@@ -96,6 +96,20 @@ class Board:
 
 			self.searcher.build(self)
 
+	@classmethod
+	def flip_2d(cls, position_layout_2d):
+		'''
+		Flip the entire board 180 degrees, leaving the pieces in their relative positions.  
+		For example, flipping a the board for a new game would put the white pieces in 
+		positions 1-12 and the black pieces in positions 25-36.  This will help with 
+		training the model so that you can use each board position from the viewpoint 
+		of the player.  
+
+		Arguments:
+		position_layout_2d - a 2D array
+		'''
+		return np.flip(np.array(position_layout_2d))
+
 	def flip_position(self, position):
 		'''
 		Flip the entire board 180 degrees, leaving the pieces in their relative positions.  
@@ -108,5 +122,5 @@ class Board:
 		position - an integer board position on a standard board (with black on top)
 		'''
 		row, col = np.argwhere(self.position_layout_2d == position)[0]
-		flipped_board = np.flip(self.position_layout_2d)
+		flipped_board = Board.flip_2d(self.position_layout_2d)
 		return flipped_board[row][col]
