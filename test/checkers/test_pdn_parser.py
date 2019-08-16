@@ -2,7 +2,7 @@ import unittest
 from checkers.pdn_parser import PDNParser
 
 class TestPDNParser(unittest.TestCase):
-    def test_parsing(self):
+    def test_parsing_full_game(self):
         pdn = '''
                 [Event "Manchester 1841"]
                 [Date "1841-??-??"]
