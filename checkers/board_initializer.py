@@ -1,3 +1,4 @@
+import numpy as np
 from .piece import Piece
 
 class BoardInitializer:
@@ -19,6 +20,10 @@ class BoardInitializer:
 			for column in range(self.board.width):
 				self.board.position_layout[row][column] = position
 				position += 1
+
+		self.board.position_layout_2d = np.array(list(map(lambda row: list(row.values()), self.board.position_layout.values())))
+		assert self.board.position_layout_2d.shape[0] == self.board.height
+		assert self.board.position_layout_2d.shape[1] == self.board.width
 
 	def set_starting_pieces(self):
 		pieces = []

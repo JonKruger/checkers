@@ -32,6 +32,9 @@ class Game:
 		else:
 			return None
 
+	def get_uncaptured_pieces(self):
+		return self.board.get_uncaptured_pieces()
+
 	def get_possible_moves(self):
 		return self.board.get_possible_moves()
 

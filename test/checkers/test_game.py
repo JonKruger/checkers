@@ -26,4 +26,3 @@ class TestGame(unittest.TestCase):
 
         self.assertListEqual(list(map(lambda p: p.position, player_1_pieces)), list(range(1,11)))
         self.assertListEqual(list(map(lambda p: p.position, player_2_pieces)), list(range(21,31)))
-

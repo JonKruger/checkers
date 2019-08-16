@@ -1,5 +1,6 @@
 from copy import deepcopy
 from functools import reduce
+import numpy as np
 from .board_searcher import BoardSearcher
 from .board_initializer import BoardInitializer
 
@@ -12,6 +13,7 @@ class Board:
 		self.position_count = self.width * self.height
 		self.rows_per_user_with_pieces = rows_per_user_with_pieces
 		self.position_layout = {}
+		self.position_layout_2d = [[]]
 		self.piece_requiring_further_capture_moves = None
 		self.previous_move_was_capture = False
 		self.searcher = BoardSearcher()
@@ -93,3 +95,18 @@ class Board:
 			[piece.reset_for_new_board() for piece in self.pieces]
 
 			self.searcher.build(self)
+
+	def flip_position(self, position):
+		'''
+		Flip the entire board 180 degrees, leaving the pieces in their relative positions.  
+		For example, flipping a the board for a new game would put the white pieces in 
+		positions 1-12 and the black pieces in positions 25-36.  This will help with 
+		training the model so that you can use each board position from the viewpoint 
+		of the player.  
+
+		Arguments:
+		position - an integer board position on a standard board (with black on top)
+		'''
+		row, col = np.argwhere(self.position_layout_2d == position)[0]
+		flipped_board = np.flip(self.position_layout_2d)
+		return flipped_board[row][col]
