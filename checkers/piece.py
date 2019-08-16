@@ -12,16 +12,6 @@ class Piece:
 		self.capture_move_enemies = {}
 		self.reset_for_new_board()
 
-	def copy(self, board):
-		copy = Piece()
-		copy.player = self.player
-		copy.other_player = self.other_player
-		copy.king = self.king
-		copy.captured = self.captured
-		copy.position = self.position
-		copy.board = board
-		return copy
-
 	def reset_for_new_board(self):
 		self.possible_capture_moves = None
 		self.possible_positional_moves = None

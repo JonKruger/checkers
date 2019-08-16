@@ -49,13 +49,13 @@ class TestPossibleMoves(unittest.TestCase):
 
 	def test_jump_required(self):
 		game = GameTestHelper()
-		game.board.set_pieces(['B 1','W 6','B 4'])
+		game.board.set_pieces(['B 1','W 6','B 4'], 1)
 		self.assertEqual(game.get_possible_moves(), [[1, 10]])
 		self.assertRaises(ValueError, lambda: game.move([4, 8]))
 
 	def test_double_jump(self):
 		game = GameTestHelper()
-		game.board.set_pieces(['B 1','W 6','W 14', 'W 16'])
+		game.board.set_pieces(['B 1','W 6','W 14', 'W 16'], 1)
 		self.assertEqual(game.whose_turn(), 1) # black
 		game = game.move([1, 10])
 		self.assertEqual(game.whose_turn(), 1) # still black because they have to jump again

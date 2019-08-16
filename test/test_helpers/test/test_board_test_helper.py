@@ -16,5 +16,5 @@ class TestBoardTestHelper(unittest.TestCase):
 
     def test_setting_pieces(self):
         board = BoardTestHelper()
-        board.set_pieces(['B 3','W 32','W king 11'])
+        board.set_pieces(['B 3','W 32','W king 11'], 1)
         assert [str(p) for p in board.pieces] == ['B 3','W 32','W king 11']

@@ -4,15 +4,18 @@ from .board import Board
 class Game:
 	CONSECUTIVE_NONCAPTURE_MOVE_LIMIT = 40
 	
-	def __init__(self, width=4, height=8, rows_per_user_with_pieces=3):
-		self.board = Board(width, height, rows_per_user_with_pieces)
+	def __init__(self, width=4, height=8, rows_per_user_with_pieces=3, board=None):
+		self.board = board or Board(width, height, rows_per_user_with_pieces)
 		self.moves = []
 		self.moves_since_last_capture = 0
+		self.previous_state = None
+		self.next_state = None
 
-	def copy(self):
-		copy = Game()
-		copy.board = self.board.copy()
-		copy.moves = self.moves.copy()
+	# Overriding this so that deepcopy doesn't include previous_state and next_state when copying
+	def __deepcopy__(self, memo):
+		board = deepcopy(self.board, memo)
+		copy = Game(board=board)
+		copy.moves = deepcopy(self.moves, memo)
 		copy.moves_since_last_capture = self.moves_since_last_capture
 		return copy
 
@@ -21,6 +24,8 @@ class Game:
 			raise ValueError('The provided move is not possible')
 
 		copy = deepcopy(self)
+		copy.previous_state = self
+		self.next_state = copy
 
 		copy.board.move(move)
 		copy.moves.append(move)
@@ -50,3 +55,6 @@ class Game:
 
 	def whose_turn(self):
 		return self.board.player_turn
+
+	def get_position_layout_2d(self, flip_for_white=False):
+		return Board.flip_2d(self.board.position_layout_2d) if (flip_for_white and self.whose_turn() == 2) else self.board.position_layout_2d

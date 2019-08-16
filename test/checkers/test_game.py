@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 from checkers.game import Game
 from test.test_helpers.game_test_helper import GameTestHelper
 
@@ -29,21 +30,8 @@ class TestGame(unittest.TestCase):
         self.assertListEqual(list(map(lambda p: p.position, player_2_pieces)), list(range(21,31)))
 
     def test_moving_creates_a_copy_of_everything(self):
-        game1 = Game()
-
-        # Make a move...
-        game2 = game1.move([11,16])
-
-        # Since making a move created a copy of everything, we can do a different move with game1
-        # since things should still be in the same state as it was before we did the 11-16 move.
-        game3 = game1.move([9,13])
-
-        self.assertNotEqual(game1, game2)
-        self.assertNotEqual(game2, game3)
-
-    def test_moving_creates_a_copy_of_everything2(self):
         game1 = GameTestHelper()
-        game1.board.set_pieces(['B 25','W 6','B 4'])
+        game1.board.set_pieces(['B 25','W 6','B 4'], 1)
 
         # Make a move...
         game2 = game1.move([4,8])
@@ -63,3 +51,8 @@ class TestGame(unittest.TestCase):
         self.assertListEqual(list(map(lambda p: p.position, black_pieces)), [4,29])
         self.assertListEqual(list(map(lambda p: p.king, black_pieces)), [False,True])
 
+    def test_game_states_reference_each_other(self):
+        game1 = Game()
+        game2 = game1.move([11,16])
+        self.assertEqual(game2.previous_state, game1)
+        self.assertEqual(game1.next_state, game2)
