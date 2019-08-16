@@ -41,7 +41,7 @@ class TestGameOver(unittest.TestCase):
 			self.move(move).expect(False)
 
 	def move(self, move):
-		self.game.move(move)
+		self.game = self.game.move(move)
 		return self
 
 	def expect(self, value):

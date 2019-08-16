@@ -17,7 +17,7 @@ class RandomAIGame:
             moves = self._game.get_possible_moves()
             move = random.choice(moves)
             print(f'Moving {move}')
-            self._game.move(move)
+            self._game = self._game.move(move)
         print(f"Winner is {'Black' if self._game.get_winner() == 1 else 'White'}!")
         print(self._game.moves)
         return self._game.moves, self._game.get_winner()

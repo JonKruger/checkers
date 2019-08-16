@@ -19,6 +19,17 @@ class Board:
 		self.searcher = BoardSearcher()
 		BoardInitializer(self).initialize()
 
+	def copy(self):
+		copy = Board(self.width, self.height, self.rows_per_user_with_pieces)
+		copy.position_layout = self.position_layout.copy()
+		copy.position_layout_2d = self.position_layout_2d.copy()
+		copy.piece_requiring_further_capture_moves = self.piece_requiring_further_capture_moves
+		copy.previous_move_was_capture = self.previous_move_was_capture
+		
+		for piece in self.pieces:
+			copy.pieces.append(piece.copy(self))
+		return copy
+
 	def count_movable_player_pieces(self, player_number = 1):
 		return reduce((lambda count, piece: count + (1 if piece.is_movable() else 0)), self.searcher.get_pieces_by_player(player_number), 0)
 
@@ -42,15 +53,13 @@ class Board:
 	def position_is_open(self, position):
 		return not self.searcher.get_piece_by_position(position)
 
-	def create_new_board_from_move(self, move):
-		new_board = deepcopy(self)
-
+	def move(self, move):
 		if move in self.get_possible_capture_moves():
-			new_board.perform_capture_move(move)
+			self.perform_capture_move(move)
 		else:
-			new_board.perform_positional_move(move)
+			self.perform_positional_move(move)
 
-		return new_board
+		return self
 
 	def perform_capture_move(self, move):
 		self.previous_move_was_capture = True

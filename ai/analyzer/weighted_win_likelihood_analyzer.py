@@ -51,7 +51,7 @@ class WeightedWinLikelihoodAnalyzer:
         previous_board_position = board_position
 
         for move in moves:
-            game.move(move)
+            game = game.move(move)
             whose_turn, uncaptured_pieces, possible_moves, winner = game.whose_turn(), game.get_uncaptured_pieces(), game.get_possible_moves(), game.get_winner()
             board_position = BoardPosition(whose_turn, uncaptured_pieces, possible_moves, winner, previous_board_position)
             previous_board_position.next_board_position = board_position

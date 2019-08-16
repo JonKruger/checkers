@@ -42,7 +42,7 @@ class TestWinner(unittest.TestCase):
 			self.move(move).expect(None)
 
 	def move(self, move):
-		self.game.move(move)
+		self.game = self.game.move(move)
 		return self
 
 	def expect(self, value):
