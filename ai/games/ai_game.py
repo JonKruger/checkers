@@ -21,7 +21,7 @@ class AIGame:
                 print(f'There are {num_possible_moves} possible moves') 
 
             moves = self._game.get_possible_moves()
-            move = self.current_turn_player().move(moves)
+            move = self.current_turn_player().select_move(self._game, moves)
             if self._verbose:
                 print(f'Moving {move}') 
             self._game = self._game.move(move)

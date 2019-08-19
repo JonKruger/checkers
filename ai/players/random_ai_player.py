@@ -1,5 +1,5 @@
 import random
 
 class RandomAIPlayer():
-    def move(self, possible_moves):
+    def select_move(self, game, possible_moves):
         return random.choice(possible_moves)

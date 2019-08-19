@@ -6,10 +6,11 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import pickle
-
+from ai.analyzer.weighted_win_likelihood_analyzer import State
 
 class NNTrainer():
-    current_model = None
+    def __init__(self):
+        self._current_model = None
 
     def train(self, weighted_states):
         seed = 1
@@ -49,17 +50,18 @@ class NNTrainer():
         for state in possible_states:
             assert type(state) == State
 
-        reshaped_states = np.array(possible_states).reshape(*possible_states.shape, 1)
+        possible_positions = [s.get_board_position_2d() for s in possible_states]
+        reshaped_states = np.array(possible_positions).reshape(*np.array(possible_positions).shape, 1)
         model = self.get_model()
 
         # for now, just doing 1 move ahead
         predictions = model.predict(reshaped_states)
-        print(f'Made {predictions.shape[0]} predictions, min = {np.min(predictions)}, max = {np.max(predictions)}')
+        #print(f'Made {predictions.shape[0]} predictions, min = {np.min(predictions)}, max = {np.max(predictions)}')
         return possible_states[np.argmax(predictions)]
 
     def get_model(self):
-        if NNTrainer.current_model is None:
-            NNTrainer.current_model = pickle.load(open('models/nn_model.pickle.dat', 'rb'))
-        return NNTrainer.current_model
+        if self._current_model is None:
+            self._current_model = pickle.load(open('models/model.pickle.dat', 'rb'))
+        return self._current_model
 
 
