@@ -40,12 +40,23 @@ class Game:
 		return self.move_limit_reached() or not self.get_possible_moves()
 
 	def get_winner(self):
-		if not self.board.count_movable_player_pieces(1):
-			return 2
-		elif not self.board.count_movable_player_pieces(2):
-			return 1
-		else:
-			return None
+		if self.is_over():
+			if self.move_limit_reached():
+				return None
+			elif not self.board.count_movable_player_pieces(1):
+				return 2
+			elif not self.board.count_movable_player_pieces(2):
+				return 1
+		return None
+
+	def black_wins(self):
+		return self.is_over() and self.get_winner() == 1
+
+	def white_wins(self):
+		return self.is_over() and self.get_winner() == 2
+
+	def is_draw(self):
+		return self.is_over() and self.get_winner() is None
 
 	def get_uncaptured_pieces(self):
 		return self.board.get_uncaptured_pieces()
