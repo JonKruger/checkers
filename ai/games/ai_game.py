@@ -34,3 +34,6 @@ class AIGame:
     
     def current_turn_player(self):
         return self._black if self._game.whose_turn() == 1 else self._white
+
+    def current_state(self):
+        return self._game

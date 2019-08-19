@@ -55,4 +55,9 @@ class TestGame(unittest.TestCase):
         game1 = Game()
         game2 = game1.move([11,16])
         self.assertEqual(game2.previous_state, game1)
-        self.assertEqual(game1.next_state, game2)
+
+    def test_get_game_states(self):
+        game1 = Game()
+        game2 = game1.move([11,16])
+        game3 = game2.move([24,20])
+        self.assertEqual(game3.get_game_states(), [game1, game2, game3])

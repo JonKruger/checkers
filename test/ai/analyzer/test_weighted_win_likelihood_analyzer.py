@@ -10,7 +10,7 @@ class TestWeightedWinLikelihoodAnalyzer(unittest.TestCase):
         game = RandomAIGame()
         moves, winner = game.play()
 
-        weights = WeightedWinLikelihoodAnalyzer().analyze_game(moves)
+        weights = WeightedWinLikelihoodAnalyzer().analyze_game(game.current_state())
         NNTrainer().train(weights)
 
     def test_get_board_position_2d_black(self):

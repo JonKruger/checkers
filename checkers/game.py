@@ -9,9 +9,8 @@ class Game:
 		self.moves = []
 		self.moves_since_last_capture = 0
 		self.previous_state = None
-		self.next_state = None
 
-	# Overriding this so that deepcopy doesn't include previous_state and next_state when copying
+	# Overriding this so that deepcopy doesn't include previous_state when copying
 	def __deepcopy__(self, memo):
 		board = deepcopy(self.board, memo)
 		copy = Game(board=board)
@@ -25,7 +24,6 @@ class Game:
 
 		copy = deepcopy(self)
 		copy.previous_state = self
-		self.next_state = copy
 
 		copy.board.move(move)
 		copy.moves.append(move)
@@ -69,3 +67,7 @@ class Game:
 
 	def get_position_layout_2d(self, flip_for_white=False):
 		return Board.flip_2d(self.board.position_layout_2d) if (flip_for_white and self.whose_turn() == 2) else self.board.position_layout_2d
+
+	def get_game_states(self):
+		return [*(self.previous_state.get_game_states() if self.previous_state is not None else []), self]
+
