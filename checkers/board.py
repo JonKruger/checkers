@@ -55,23 +55,26 @@ class Board:
 		return self.searcher.get_pieces_by_player(player_number)
 
 	def get_possible_moves(self):
-		#if self._possible_moves is None:
-		capture_moves = self.get_possible_capture_moves()
-		self._possible_moves = capture_moves if capture_moves else self.get_possible_positional_moves()
+		if self._possible_moves is None:
+			capture_moves = self.get_possible_capture_moves()
+			self._possible_moves = capture_moves if capture_moves else self.get_possible_positional_moves()
 		return self._possible_moves
 
-	def get_possible_capture_moves(self, last_capturer_position=None):
-		#if self._possible_capture_moves is None:
-		if last_capturer_position is not None:
-			pieces_that_can_capture = [self.searcher.get_piece_by_position(last_capturer_position)]
-		else:
+	def get_possible_capture_moves(self):
+		if self._possible_capture_moves is None:
 			pieces_that_can_capture = self.searcher.get_pieces_in_play()
-		self._possible_capture_moves = reduce((lambda moves, piece: moves + piece.get_possible_capture_moves()), pieces_that_can_capture, [])
+			self._possible_capture_moves = self._get_possible_capture_moves_for_pieces(pieces_that_can_capture)
 		return self._possible_capture_moves
 
+	def get_possible_capture_moves_for_last_capturer(self, last_capturer_position):
+		return self._get_possible_capture_moves_for_pieces([self.searcher.get_piece_by_position(last_capturer_position)])
+
+	def _get_possible_capture_moves_for_pieces(self, pieces_that_can_capture):
+		return reduce((lambda moves, piece: moves + piece.get_possible_capture_moves()), pieces_that_can_capture, [])
+
 	def get_possible_positional_moves(self):
-		#if self._possible_positional_moves is None:
-		self._possible_positional_moves = reduce((lambda moves, piece: moves + piece.get_possible_positional_moves()), self.searcher.get_pieces_in_play(), [])
+		if self._possible_positional_moves is None:
+			self._possible_positional_moves = reduce((lambda moves, piece: moves + piece.get_possible_positional_moves()), self.searcher.get_pieces_in_play(), [])
 		return self._possible_positional_moves
 
 	def position_is_open(self, position):
@@ -90,15 +93,12 @@ class Board:
 		piece = self.searcher.get_piece_by_position(move[0])
 		originally_was_king = piece.king
 		enemy_piece = piece.get_capture_move_enemy(move[1])
-		print(f'about to capture piece at {enemy_piece.position} using piece at {move[0]}')
 		enemy_piece.capture()
 		self.move_piece(move, True)
-		further_capture_moves_for_piece = [capture_move for capture_move in self.get_possible_capture_moves(last_capturer_position=move[1]) if capture_move[0] == move[1]]
-		print(f'just moved, now possible capture moves are {further_capture_moves_for_piece}')
+		further_capture_moves_for_piece = [capture_move for capture_move in self.get_possible_capture_moves_for_last_capturer(move[1]) if capture_move[0] == move[1]]
 
 		if further_capture_moves_for_piece and (originally_was_king == piece.king):
 			self.piece_requiring_further_capture_moves = self.searcher.get_piece_by_position(move[1])
-			print('further_capture_moves_for_piece:', self.piece_requiring_further_capture_moves)
 		else:
 			self.piece_requiring_further_capture_moves = None
 			self.switch_turn()
@@ -120,8 +120,6 @@ class Board:
 		self._possible_positional_moves = None
 
 		self.pieces = sorted(self.pieces, key = lambda piece: piece.position if piece.position else 0)
-		print(f'just moved piece to {move[1]}, now possible capture moves are: {self.searcher.get_piece_by_position(move[1]).get_possible_capture_moves()}')
-
 
 	def is_valid_row_and_column(self, row, column):
 		if row < 0 or row >= self.height:
