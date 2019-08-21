@@ -28,6 +28,12 @@ class State:
             result[x,y] = value
         return result
 
+    def whose_turn(self):
+        return self.state.whose_turn()
+
+    def current_player_score(self):
+        return self.player_1_score if self.whose_turn() == 1 else self.player_2_score
+
     def calculate_scores(self, winner, num_lookaheads=NUM_LOOKAHEADS):
         print(f'# moves: {len(self.state.moves)}, num_lookaheads: {num_lookaheads}')
         player_1_score = None

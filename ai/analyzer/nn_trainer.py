@@ -16,7 +16,7 @@ class NNTrainer():
         seed = 1
         np.random.seed(seed)
 
-        board_shape = tuple(weighted_states[0].state.get_position_layout_2d().shape)
+        board_shape = tuple(weighted_states[0].state.get_position_layout_2d(1).shape)
         input_shape = (*board_shape, 1)
         X = np.array(list(map(lambda ws: ws.get_board_position_2d(), weighted_states)))
         X = X.reshape(X.shape[0], *input_shape)
@@ -50,7 +50,7 @@ class NNTrainer():
         for state in possible_states:
             assert type(state) == State
 
-        possible_positions = [s.get_board_position_2d() for s in possible_states]
+        possible_positions = [s.get_board_position_2d(s.whose_turn()) for s in possible_states]
         reshaped_states = np.array(possible_positions).reshape(*np.array(possible_positions).shape, 1)
         model = self.get_model()
 
