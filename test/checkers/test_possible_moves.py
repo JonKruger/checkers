@@ -65,7 +65,10 @@ class TestPossibleMoves(unittest.TestCase):
 		assert [str(p) for p in game.board.get_uncaptured_pieces()] == ['W 16', 'B 17']
 
 	def move(self, move):
-		return self.game.move(move)
+		print([str(p) for p in self.game.get_uncaptured_pieces()], self.game.whose_turn(), move)
+		self.game = self.game.move(move)
+		print(f'possible moves are: {self.game.get_possible_moves()}')
+		return self.game
 
 	def expect(self, expected_possible_moves):
 		self.assertEqual(self.game.get_possible_moves(), expected_possible_moves)

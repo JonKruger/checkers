@@ -9,6 +9,7 @@ class Game:
 		self.moves = []
 		self.moves_since_last_capture = 0
 		self.previous_state = None
+		self._possible_next_states = None
 
 	# Overriding this so that deepcopy doesn't include previous_state when copying
 	def __deepcopy__(self, memo):
@@ -16,6 +17,11 @@ class Game:
 		copy = Game(board=board)
 		copy.moves = deepcopy(self.moves, memo)
 		copy.moves_since_last_capture = self.moves_since_last_capture
+
+		# Don't copy cached values
+		copy.previous_state = None
+		copy._possible_next_states = None
+
 		return copy
 
 	def move(self, move):
@@ -62,12 +68,41 @@ class Game:
 	def get_possible_moves(self):
 		return self.board.get_possible_moves()
 
+	def get_possible_next_states(self, actual_next_state=None, force_reload=False):
+		# If we have a cached list of next states and someone passes in an actual_next_state
+		# that isn't in that list, we have to reload the list.
+		if self._possible_next_states is not None and actual_next_state is not None and actual_next_state not in self._possible_next_states:
+			force_reload = True
+
+		if self._possible_next_states is None or force_reload == True:
+			self._possible_next_states = []
+
+			actual_next_move = None
+			if actual_next_state is not None:
+				actual_next_move = actual_next_state.last_move()
+
+			for move in self.get_possible_moves():
+				if move == actual_next_move:
+					self._possible_next_states.append(actual_next_state)
+				else:
+					self._possible_next_states.append(self.move(move))
+
+		return self._possible_next_states	
+
 	def whose_turn(self):
 		return self.board.player_turn
 
-	def get_position_layout_2d(self, flip_for_white=False):
-		return Board.flip_2d(self.board.position_layout_2d) if (flip_for_white and self.whose_turn() == 2) else self.board.position_layout_2d
+	def get_position_layout_2d(self, player):
+		return Board.flip_2d(self.board.position_layout_2d) if player == 2 else self.board.position_layout_2d
 
 	def get_game_states(self):
 		return [*(self.previous_state.get_game_states() if self.previous_state is not None else []), self]
 
+	def board_height(self):
+		return self.board.height
+
+	def board_width(self):
+		return self.board.width
+
+	def last_move(self):
+		return self.moves[-1] if (len(self.moves) > 0) else None

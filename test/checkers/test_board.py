@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+from copy import deepcopy
 from checkers.board import Board
 from checkers.game import Game
 
@@ -16,6 +17,4 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(board.flip_position(4), 29)
         self.assertEqual(board.flip_position(19), 14)
         self.assertEqual(board.flip_position(14), 19)
-
-
 

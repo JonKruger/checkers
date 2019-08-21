@@ -17,7 +17,33 @@ class Board:
 		self.piece_requiring_further_capture_moves = None
 		self.previous_move_was_capture = False
 		self.searcher = BoardSearcher()
+		self._possible_moves = None
+		self._possible_capture_moves = None
+		self._possible_positional_moves = None
 		BoardInitializer(self).initialize()
+
+	# Overriding this so that deepcopy doesn't include cached_values when copying
+	def __deepcopy__(self, memo):
+		copy = Board(width=self.width, height=self.height, rows_per_user_with_pieces=self.rows_per_user_with_pieces)
+		copy.player_turn = self.player_turn
+		copy.position_layout = deepcopy(self.position_layout)
+		copy.position_layout_2d = deepcopy(self.position_layout_2d)
+		copy.piece_requiring_further_capture_moves = self.piece_requiring_further_capture_moves
+		copy.previous_move_was_capture = self.previous_move_was_capture
+		copy.searcher = BoardSearcher()
+
+		pieces = deepcopy(self.pieces)
+		for piece in pieces:
+			piece.board = copy
+		copy.pieces = pieces
+
+		# We don't want to copy these cached values
+		copy._possible_moves = None
+		copy._possible_capture_moves = None
+		copy._possible_positional_moves = None
+
+		return copy
+
 
 	def count_movable_player_pieces(self, player_number = 1):
 		return reduce((lambda count, piece: count + (1 if piece.is_movable() else 0)), self.searcher.get_pieces_by_player(player_number), 0)
@@ -29,15 +55,24 @@ class Board:
 		return self.searcher.get_pieces_by_player(player_number)
 
 	def get_possible_moves(self):
+		#if self._possible_moves is None:
 		capture_moves = self.get_possible_capture_moves()
+		self._possible_moves = capture_moves if capture_moves else self.get_possible_positional_moves()
+		return self._possible_moves
 
-		return capture_moves if capture_moves else self.get_possible_positional_moves()
-
-	def get_possible_capture_moves(self):
-		return reduce((lambda moves, piece: moves + piece.get_possible_capture_moves()), self.searcher.get_pieces_in_play(), [])
+	def get_possible_capture_moves(self, last_capturer_position=None):
+		#if self._possible_capture_moves is None:
+		if last_capturer_position is not None:
+			pieces_that_can_capture = [self.searcher.get_piece_by_position(last_capturer_position)]
+		else:
+			pieces_that_can_capture = self.searcher.get_pieces_in_play()
+		self._possible_capture_moves = reduce((lambda moves, piece: moves + piece.get_possible_capture_moves()), pieces_that_can_capture, [])
+		return self._possible_capture_moves
 
 	def get_possible_positional_moves(self):
-		return reduce((lambda moves, piece: moves + piece.get_possible_positional_moves()), self.searcher.get_pieces_in_play(), [])
+		#if self._possible_positional_moves is None:
+		self._possible_positional_moves = reduce((lambda moves, piece: moves + piece.get_possible_positional_moves()), self.searcher.get_pieces_in_play(), [])
+		return self._possible_positional_moves
 
 	def position_is_open(self, position):
 		return not self.searcher.get_piece_by_position(position)
@@ -54,28 +89,39 @@ class Board:
 		self.previous_move_was_capture = True
 		piece = self.searcher.get_piece_by_position(move[0])
 		originally_was_king = piece.king
-		enemy_piece = piece.capture_move_enemies[move[1]]
+		enemy_piece = piece.get_capture_move_enemy(move[1])
+		print(f'about to capture piece at {enemy_piece.position} using piece at {move[0]}')
 		enemy_piece.capture()
-		self.move_piece(move)
-		further_capture_moves_for_piece = [capture_move for capture_move in self.get_possible_capture_moves() if move[1] == capture_move[0]]
+		self.move_piece(move, True)
+		further_capture_moves_for_piece = [capture_move for capture_move in self.get_possible_capture_moves(last_capturer_position=move[1]) if capture_move[0] == move[1]]
+		print(f'just moved, now possible capture moves are {further_capture_moves_for_piece}')
 
 		if further_capture_moves_for_piece and (originally_was_king == piece.king):
 			self.piece_requiring_further_capture_moves = self.searcher.get_piece_by_position(move[1])
+			print('further_capture_moves_for_piece:', self.piece_requiring_further_capture_moves)
 		else:
 			self.piece_requiring_further_capture_moves = None
 			self.switch_turn()
 
 	def perform_positional_move(self, move):
 		self.previous_move_was_capture = False
-		self.move_piece(move)
+		self.move_piece(move, False)
 		self.switch_turn()
 
 	def switch_turn(self):
 		self.player_turn = 1 if self.player_turn == 2 else 2
 
-	def move_piece(self, move):
+	def move_piece(self, move, is_capture):
 		self.searcher.get_piece_by_position(move[0]).move(move[1])
+
+		# clear cached values
+		self._possible_moves = None
+		self._possible_capture_moves = None
+		self._possible_positional_moves = None
+
 		self.pieces = sorted(self.pieces, key = lambda piece: piece.position if piece.position else 0)
+		print(f'just moved piece to {move[1]}, now possible capture moves are: {self.searcher.get_piece_by_position(move[1]).get_possible_capture_moves()}')
+
 
 	def is_valid_row_and_column(self, row, column):
 		if row < 0 or row >= self.height:

@@ -61,3 +61,46 @@ class TestGame(unittest.TestCase):
         game2 = game1.move([11,16])
         game3 = game2.move([24,20])
         self.assertEqual(game3.get_game_states(), [game1, game2, game3])
+
+    def test_last_move(self):
+        game1 = Game()
+        self.assertIsNone(game1.last_move())
+
+        game2 = game1.move([11,16])
+        self.assertEqual(game2.last_move(), [11,16])
+
+    def test_get_possible_next_states(self):
+        game1 = Game()
+        game2 = game1.move([11,16])
+
+        next_states = game1.get_possible_next_states(actual_next_state=game2)
+        self.assertEqual(len(next_states), 7)
+        self.assertEqual(type(next_states[0]), Game)
+
+        actual_next_state = next(s for s in next_states if s.last_move() == [11,16])
+        self.assertEqual(actual_next_state, game2)
+
+    def test_get_possible_next_states_new_actual_next_state(self):
+        # re-do the same move, pass in a new actual_next_state
+        game1 = Game()
+        game2_1 = game1.move([11,16])
+        next_states = game1.get_possible_next_states(actual_next_state=game2_1)
+
+        game2_2 = game1.move([11,16])
+        next_states = game1.get_possible_next_states(actual_next_state=game2_2)
+        self.assertEqual(len(next_states), 7)
+
+        actual_next_state = next(s for s in next_states if s.last_move() == [11,16])
+        self.assertEqual(actual_next_state, game2_2)
+
+    def test_get_possible_next_states_force_reload(self):
+        game1 = Game()
+        game2 = game1.move([11,16])
+
+        # force_reload = True
+        next_states = game1.get_possible_next_states(actual_next_state=game2, force_reload=True)
+        self.assertEqual(len(next_states), 7)
+        self.assertEqual(type(next_states[0]), Game)
+
+        actual_next_state = next(s for s in next_states if s.last_move() == [11,16])
+        self.assertEqual(actual_next_state, game2)
