@@ -93,6 +93,9 @@ class Game:
 	def get_possible_moves(self):
 		return self.board.get_possible_moves()
 
+	def get_possible_capture_moves(self):
+		return self.board.get_possible_capture_moves()
+
 	def get_possible_next_states(self, actual_next_state=None, force_reload=False):
 		# If we have a cached list of next states and someone passes in an actual_next_state
 		# that isn't in that list, we have to reload the list.

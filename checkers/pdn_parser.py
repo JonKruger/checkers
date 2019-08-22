@@ -67,7 +67,7 @@ class PDNParser():
     def _replay_game(self, moves, result):
         game = Game()
         for move in moves:
-            game = game.move(move)
+            game = self._replay_move(game, move)
 
         if result == '0-1' and game.get_winner() != 2:
             game = game.resign(resigning_player=1)
@@ -77,3 +77,24 @@ class PDNParser():
             game = game.agree_to_draw()
 
         return game
+
+    def _replay_move(self, game, move):
+        try:
+            return game.move(move)
+        except ValueError:
+            return self._replay_implicit_capture_moves(game, move, move[1])
+    
+    def _replay_implicit_capture_moves(self, game, move, final_destination):
+        capture_move_for_this_piece = next(m for m in game.get_possible_capture_moves() if m[0] == move[0])
+        if capture_move_for_this_piece is None:
+            raise ValueError('The provided move is not possible')
+
+        game = game.move(capture_move_for_this_piece)
+        
+        if capture_move_for_this_piece[1] == final_destination:
+            return game
+        else:
+            return self._replay_implicit_capture_moves(game, [capture_move_for_this_piece[1], final_destination], final_destination)
+        
+
+

@@ -22,7 +22,6 @@ class State:
 
     def get_board_position_2d(self, player):
         if self._player_1_board_position_2d is None:
-            print(f'building player 1 result - player passed in is {player}')
             result = np.tile(0, [self.state.board_height(), self.state.board_width()])
 
             for piece in self.state.get_uncaptured_pieces():
@@ -42,7 +41,6 @@ class State:
         return self.player_1_score if self.whose_turn() == 1 else self.player_2_score
 
     def calculate_scores(self, winner, num_lookaheads=NUM_LOOKAHEADS):
-        print(f'# moves: {len(self.state.moves)}, num_lookaheads: {num_lookaheads}')
         player_1_score = None
         player_2_score = None
         if self.state.is_over():
@@ -61,7 +59,6 @@ class State:
                 possible_p1_move_outcomes = []
                 possible_p2_move_outcomes = []
                 possible_next_states = self.state.get_possible_next_states(actual_next_state=(self.actual_next_state.state if self.actual_next_state else None))
-                print(f'there are {len(possible_next_states)} possible moves from here')
                 for next_state in possible_next_states:
                     move = next_state.last_move()
                     next_state = State(next_state)
@@ -130,7 +127,8 @@ class WeightedWinLikelihoodAnalyzer:
     def _calculate_weights(self, states, winner):
         start = datetime.now()
 
-        for state in reversed(states):
+        for counter, state in enumerate(reversed(states)):
+            print(f'Analyzing move {len(states) - counter} of {len(states)}')
             state.calculate_scores(winner)
 
         print(datetime.now() - start)
