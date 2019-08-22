@@ -18,9 +18,9 @@ class NNTrainer():
 
         board_shape = tuple(weighted_states[0].state.get_position_layout_2d(1).shape)
         input_shape = (*board_shape, 1)
-        X = np.array(list(map(lambda ws: ws.get_board_position_2d(), weighted_states)))
+        X = np.array(list(map(lambda ws: ws.get_board_position_2d(1), weighted_states)) + list(map(lambda ws: ws.get_board_position_2d(2), weighted_states)))
         X = X.reshape(X.shape[0], *input_shape)
-        y = list(map(lambda ws: ws.weight, weighted_states))
+        y = list(map(lambda ws: ws.player_1_score, weighted_states)) + list(map(lambda ws: ws.player_2_score, weighted_states))
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed, shuffle=True)
 

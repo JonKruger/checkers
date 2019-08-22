@@ -25,4 +25,5 @@ class TestWeightedWinLikelihoodAnalyzer(unittest.TestCase):
         game.board.set_pieces(['B 5','W 6','B king 4', 'W king 32'], 2)
 
         board_position_2d = State(game).get_board_position_2d(2)
+        print(board_position_2d)
         np.testing.assert_array_equal(board_position_2d, [[3,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,1,-1],[-3,0,0,0]])

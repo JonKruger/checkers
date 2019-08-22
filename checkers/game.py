@@ -10,6 +10,8 @@ class Game:
 		self.moves_since_last_capture = 0
 		self.previous_state = None
 		self._possible_next_states = None
+		self._winner = None
+		self._is_draw = False
 
 	# Overriding this so that deepcopy doesn't include previous_state when copying
 	def __deepcopy__(self, memo):
@@ -17,6 +19,8 @@ class Game:
 		copy = Game(board=board)
 		copy.moves = deepcopy(self.moves, memo)
 		copy.moves_since_last_capture = self.moves_since_last_capture
+		copy._winner = self._winner
+		copy._is_draw = self._is_draw
 
 		# Don't copy cached values
 		copy.previous_state = None
@@ -35,32 +39,53 @@ class Game:
 		copy.moves.append(move)
 		copy.moves_since_last_capture = 0 if copy.board.previous_move_was_capture else copy.moves_since_last_capture + 1
 
+		copy._determine_result()
+
 		return copy
 
-	def move_limit_reached(self):
+	def resign(self, resigning_player=None):
+		copy = deepcopy(self)
+		copy.previous_state = self
+
+		if resigning_player is None:
+			resigning_player = copy.whose_turn()
+		copy._winner = 1 if resigning_player == 2 else 2
+		copy._is_draw = False
+		return copy
+
+	def agree_to_draw(self):
+		copy = deepcopy(self)
+		copy.previous_state = self
+
+		copy._is_draw = True
+		copy._winner = None
+		return copy
+
+	def _determine_result(self):
+		if self._move_limit_reached():
+			self._is_draw = True
+		elif not self.board.count_movable_player_pieces(1):
+			self._winner = 2
+		elif not self.board.count_movable_player_pieces(2):
+			self._winner = 1 
+
+	def _move_limit_reached(self):
 		return self.moves_since_last_capture >= Game.CONSECUTIVE_NONCAPTURE_MOVE_LIMIT
 
 	def is_over(self):
-		return self.move_limit_reached() or not self.get_possible_moves()
+		return self._is_draw or self._winner is not None
 
 	def get_winner(self):
-		if self.is_over():
-			if self.move_limit_reached():
-				return None
-			elif not self.board.count_movable_player_pieces(1):
-				return 2
-			elif not self.board.count_movable_player_pieces(2):
-				return 1
-		return None
+		return self._winner
 
 	def black_wins(self):
-		return self.is_over() and self.get_winner() == 1
+		return self._winner == 1
 
 	def white_wins(self):
-		return self.is_over() and self.get_winner() == 2
+		return self._winner == 2
 
 	def is_draw(self):
-		return self.is_over() and self.get_winner() is None
+		return self._is_draw 
 
 	def get_uncaptured_pieces(self):
 		return self.board.get_uncaptured_pieces()

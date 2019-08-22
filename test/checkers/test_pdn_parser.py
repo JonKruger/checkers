@@ -4,15 +4,16 @@ from checkers.pdn_parser import PDNParser
 class TestPDNParser(unittest.TestCase):
     def test_parsing_full_game(self):
         pdn = '''
-                [Event "Manchester 1841"]
+                [Event "Test game"]
                 [Date "1841-??-??"]
                 [Black "Moorhead, W."]
                 [White "Wyllie, J."]
                 [Site "Manchester"]
                 [Result "0-1"]
-                1. 11-15 24-20 {yeah I know these moves are actually not valid, I'm just testing parsing} 2. 19x12 26x17x10x1 0-1
+                1. 9-14 23-18 {this is a note} 2. 14x23 26x19
+                {sometimes they put in random line breaks like this}
+                3. 11-16 24-20 0-1
             '''
-        moves, result = PDNParser().parse(pdn)
-        self.assertEqual(moves, [[11,15],[24,20],[19,12],[26,17],[17,10],[10,1]])
-        self.assertEqual(result, '0-1')
-        print('result', result)
+        game = PDNParser().parse(pdn)
+        self.assertEqual(game.moves, [[9,14],[23,18],[14,23],[26,19],[11,16],[24,20]])
+        self.assertEqual(game.get_winner(), 2)

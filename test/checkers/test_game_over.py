@@ -36,6 +36,32 @@ class TestGameOver(unittest.TestCase):
 
 		self.move([11, 8]).expect(True)
 
+	def test_resigning_current_player(self):
+		game = Game()
+		game = game.move([11,16])
+		game = game.resign()
+		self.assertTrue(game.is_over())
+		self.assertEqual(game.get_winner(), 1)
+
+	def test_resigning_player_1(self):
+		game = Game()
+		game = game.move([11,16])
+		game = game.resign(resigning_player=1)
+		self.assertTrue(game.is_over())
+		self.assertEqual(game.get_winner(), 2)
+
+	def test_resigning_player_2(self):
+		game = Game()
+		game = game.resign(resigning_player=2)
+		self.assertTrue(game.is_over())
+		self.assertEqual(game.get_winner(), 1)
+
+	def test_agree_to_draw(self):
+		game = Game()
+		game = game.agree_to_draw()
+		self.assertTrue(game.is_over())
+		self.assertTrue(game.is_draw())
+
 	def make_non_final_moves(self, moves):
 		for move in moves:
 			self.move(move).expect(False)

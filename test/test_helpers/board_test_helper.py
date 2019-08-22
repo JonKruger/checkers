@@ -12,7 +12,8 @@ class BoardTestHelper(Board):
         self.pieces = pieces
         self.player_turn = whose_turn
 
-    def parse_piece_notation(notation):
+    @classmethod
+    def parse_piece_notation(cls, notation):
         values = notation.split() 
         
         piece = Piece()

@@ -15,18 +15,25 @@ class State:
         self.player_1_score = None
         self.player_2_score = None
 
+        self._player_1_board_position_2d = None
+
     def get_position_layout_2d(self, player):
         return self.state.get_position_layout_2d(player)
 
     def get_board_position_2d(self, player):
-        result = np.tile(0, [self.state.board_height(), self.state.board_width()])
-        position_layout_2d = self.get_position_layout_2d(player)
+        if self._player_1_board_position_2d is None:
+            print(f'building player 1 result - player passed in is {player}')
+            result = np.tile(0, [self.state.board_height(), self.state.board_width()])
 
-        for piece in self.state.get_uncaptured_pieces():
-            x, y = np.argwhere(position_layout_2d == piece.position)[0]
-            value = (3 if piece.king else 1) * (1 if piece.player == player else -1)
-            result[x,y] = value
-        return result
+            for piece in self.state.get_uncaptured_pieces():
+                x = int((piece.position - 1) / 4)
+                y = (piece.position - 1) % 4
+                    
+                value = (3 if piece.king else 1) * (1 if piece.player == 1 else -1)
+                result[x,y] = value
+            self._player_1_board_position_2d = result
+
+        return self._player_1_board_position_2d if player == 1 else (Board.flip_2d(self._player_1_board_position_2d) * -1)
 
     def whose_turn(self):
         return self.state.whose_turn()
