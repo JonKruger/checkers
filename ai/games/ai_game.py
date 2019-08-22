@@ -15,22 +15,19 @@ class AIGame:
             if self._verbose:
                 print(f"It's {'Black' if self._game.whose_turn() == 1 else 'White'}'s turn") 
             
-            num_possible_moves = len(self._game.get_possible_moves())
-            
-            if self._verbose:
-                print(f'There are {num_possible_moves} possible moves') 
-
             moves = self._game.get_possible_moves()
             move = self.current_turn_player().select_move(self._game, moves)
             if self._verbose:
-                print(f'Moving {move}') 
+                print(f'Moving {move}...') 
             self._game = self._game.move(move)
+            if self._verbose:
+                print(f'Pieces remaining: {self._game.get_uncaptured_pieces()}')
         
         if self._verbose:
             print(f"Winner is {'Black' if self._game.get_winner() == 1 else 'White'}!") 
             print(self._game.moves) 
         
-        return self._game.moves, self._game.get_winner()
+        return self._game
     
     def current_turn_player(self):
         return self._black if self._game.whose_turn() == 1 else self._white

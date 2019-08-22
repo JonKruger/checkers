@@ -29,6 +29,7 @@ class Game:
 		return copy
 
 	def move(self, move):
+		assert type(move) == list and len(move) == 2, move
 		if move not in self.get_possible_moves():
 			raise ValueError('The provided move is not possible')
 

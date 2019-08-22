@@ -1,4 +1,5 @@
 import numpy as np
+import multiprocessing as mp
 from datetime import datetime
 from checkers.game import Game
 from checkers.board import Board
@@ -37,8 +38,8 @@ class State:
     def whose_turn(self):
         return self.state.whose_turn()
 
-    def current_player_score(self):
-        return self.player_1_score if self.whose_turn() == 1 else self.player_2_score
+    def get_score_for_player(self, player_number):
+        return self.player_1_score if player_number == 1 else self.player_2_score
 
     @classmethod
     def calculate_raw_training_score(cls, state, player):
@@ -70,6 +71,7 @@ class State:
                 possible_p1_move_outcomes = []
                 possible_p2_move_outcomes = []
                 possible_next_states = self.state.get_possible_next_states(actual_next_state=(self.actual_next_state.state if self.actual_next_state else None))
+
                 for next_state in possible_next_states:
                     possible_p1_move_outcome, possible_p2_move_outcome = self._calculate_possible_outcomes(next_state, winner, raw_score_fn, raw_player_1_score, raw_player_2_score, num_lookaheads)
                     possible_p1_move_outcomes.append(possible_p1_move_outcome)
