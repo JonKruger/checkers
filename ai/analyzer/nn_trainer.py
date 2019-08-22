@@ -7,6 +7,7 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import pickle
+import multiprocessing as mp
 from ai.analyzer.weighted_win_likelihood_analyzer import State
 
 class NNTrainer():
@@ -53,13 +54,16 @@ class NNTrainer():
             return possible_states[0]
 
         start = datetime.now()
-        possible_state_scores = []
-        for state in possible_states:
-            assert type(state) == State
-            state.calculate_scores(None, lambda state, player: State.calculate_raw_training_score(state, player))
-            possible_state_scores.append(state.current_player_score())
+        pool = mp.Pool(mp.cpu_count())
+        possible_state_scores = pool.map(self.predict_one, [possible_state for possible_state in possible_states])
+        pool.close()
+
         print(f'Predicting the best move took {datetime.now() - start}, scores: {[round(s,2) for s in possible_state_scores]}')
         return possible_states[np.argmax(possible_state_scores)]
+
+    def predict_one(self, possible_state):
+        possible_state.calculate_scores(None, lambda inner_state, player: State.calculate_raw_training_score(inner_state, player))
+        return possible_state.current_player_score()
 
     def predict_raw_score(self, state, player):
         possible_position = state.get_board_position_2d(player)
