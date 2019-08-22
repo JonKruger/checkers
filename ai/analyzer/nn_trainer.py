@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, MaxPooling2D
 from keras.layers.convolutional import Conv2D
@@ -47,17 +48,24 @@ class NNTrainer():
         Parameters
         possible_states - an array of possible board states.  
         '''
+
+        if len(possible_states) == 1:
+            return possible_states[0]
+
+        start = datetime.now()
+        possible_state_scores = []
         for state in possible_states:
             assert type(state) == State
+            state.calculate_scores(None, lambda state, player: State.calculate_raw_training_score(state, player))
+            possible_state_scores.append(state.current_player_score())
+        print(f'Predicting the best move took {datetime.now() - start}, scores: {[round(s,2) for s in possible_state_scores]}')
+        return possible_states[np.argmax(possible_state_scores)]
 
-        possible_positions = [s.get_board_position_2d(s.whose_turn()) for s in possible_states]
-        reshaped_states = np.array(possible_positions).reshape(*np.array(possible_positions).shape, 1)
+    def predict_raw_score(self, state, player):
+        possible_position = state.get_board_position_2d(player)
+        reshaped_state = np.array([possible_position]).reshape(1, *np.array(possible_position).shape, 1)
         model = self.get_model()
-
-        # for now, just doing 1 move ahead
-        predictions = model.predict(reshaped_states)
-        #print(f'Made {predictions.shape[0]} predictions, min = {np.min(predictions)}, max = {np.max(predictions)}')
-        return possible_states[np.argmax(predictions)]
+        return model.predict(reshaped_state)[0,0]
 
     def get_model(self):
         if self._current_model is None:

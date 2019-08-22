@@ -40,21 +40,32 @@ class State:
     def current_player_score(self):
         return self.player_1_score if self.whose_turn() == 1 else self.player_2_score
 
-    def calculate_scores(self, winner, num_lookaheads=NUM_LOOKAHEADS):
+    @classmethod
+    def calculate_raw_training_score(cls, state, player):
+        if state.state.is_over():
+            # The game ended
+            if (state.state.is_draw()): # draw
+                return 0
+            else:
+                return 30. if state.state.get_winner() == player else -30.
+        else:
+            return np.sum(state.get_board_position_2d(player))
+
+    def calculate_scores(self, winner, raw_score_fn, num_lookaheads=NUM_LOOKAHEADS):
         player_1_score = None
         player_2_score = None
-        if self.state.is_over():
-            # The game ended
-            if (self.state.is_draw()): # draw
-                player_1_score = 0
-                player_2_score = 0
-            else:
-                player_1_score = 30. if winner == 1 else -30.
-                player_2_score = 30. if winner == 2 else -30.
-        else:
-            raw_player_1_score = np.sum(self.get_board_position_2d(1))
-            raw_player_2_score = np.sum(self.get_board_position_2d(2))
 
+        if self.state.whose_turn() == 1:
+            raw_player_1_score = float(raw_score_fn(self, 1))
+            raw_player_2_score = -raw_player_1_score
+        else:
+            raw_player_2_score = float(raw_score_fn(self, 2))
+            raw_player_1_score = -raw_player_2_score
+
+        if self.state.is_over():
+            self.player_1_score = raw_player_1_score
+            self.player_2_score = raw_player_2_score
+        else:
             if num_lookaheads > 0:
                 possible_p1_move_outcomes = []
                 possible_p2_move_outcomes = []
@@ -62,7 +73,7 @@ class State:
                 for next_state in possible_next_states:
                     move = next_state.last_move()
                     next_state = State(next_state)
-                    next_player_1_score, next_player_2_score = next_state.calculate_scores(winner, num_lookaheads - 1)
+                    next_player_1_score, next_player_2_score = next_state.calculate_scores(winner, raw_score_fn, num_lookaheads - 1)
 
                     player_1_score_diff = next_player_1_score - raw_player_1_score
                     player_2_score_diff = next_player_2_score - raw_player_2_score
@@ -101,8 +112,8 @@ class State:
                 player_1_score = raw_player_1_score
                 player_2_score = raw_player_2_score
 
-        self.player_1_score = player_1_score
-        self.player_2_score = player_2_score
+            self.player_1_score = player_1_score
+            self.player_2_score = player_2_score
         
         return player_1_score, player_2_score
 
@@ -129,7 +140,7 @@ class WeightedWinLikelihoodAnalyzer:
 
         for counter, state in enumerate(reversed(states)):
             print(f'Analyzing move {len(states) - counter} of {len(states)}')
-            state.calculate_scores(winner)
+            state.calculate_scores(winner, State.calculate_raw_training_score)
 
         print(datetime.now() - start)
         
